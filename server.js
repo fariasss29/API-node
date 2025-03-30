@@ -1,18 +1,39 @@
+import express from 'express';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+const app = express();
+app.use(express.json());
+
+// Rota para criar um usuário
 app.post('/usuarios', async (req, res) => {
     try {
         const user = await prisma.user.create({
             data: {
-                name: req.body.nome,  // Corrigido de "name" para "nome"
-                age: req.body.idade,  // Corrigido de "age" para "idade"
-                email: req.body.email
+                email: req.body.email,
+                name: req.body.name,
+                age: req.body.age
             }
         });
 
         res.status(201).json(user);
     } catch (error) {
-        console.error(error); // Log do erro no console
         res.status(500).json({ error: 'Erro ao criar usuário' });
     }
+});
+
+// Rota para listar todos os usuários
+app.get('/usuarios', async (req, res) => {
+    try {
+        const users = await prisma.user.findMany(); // Busca do banco de dados
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ error: 'Erro ao buscar usuários' });
+    }
+});
+
+app.listen(3001, () => {
+    console.log('Servidor rodando na porta 3001');
 });
 
 
